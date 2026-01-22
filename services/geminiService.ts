@@ -2,7 +2,16 @@
 import { GoogleGenAI } from "@google/genai";
 import { Message, PatientProfile } from "../types";
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+// We initialize inside a getter to avoid top-level crashes 
+// if the environment variable isn't ready immediately.
+const getAIClient = () => {
+  const apiKey = process.env.API_KEY;
+  if (!apiKey) {
+    console.error("Gemini API Key is missing. Please set API_KEY in your environment variables.");
+    return null;
+  }
+  return new GoogleGenAI({ apiKey });
+};
 
 export async function getAIResponse(
   prompt: string, 
@@ -11,6 +20,9 @@ export async function getAIResponse(
   systemInstruction: string
 ): Promise<string> {
   try {
+    const ai = getAIClient();
+    if (!ai) return "The AI assistant is currently offline (Missing API Key). Please use the SOS button for urgent clinical matters.";
+
     const formattedHistory = history.slice(-10).map(m => 
       `${m.senderRole === 'AI' ? 'Assistant' : 'User'}: ${m.text}`
     ).join('\n');
@@ -37,6 +49,6 @@ export async function getAIResponse(
     return response.text || "Connection error. Please use SOS if urgent.";
   } catch (error) {
     console.error("AI Error:", error);
-    return "AI is busy. Your doctor is notified.";
+    return "The AI assistant is experiencing high traffic. Your clinical team has been notified of your activity.";
   }
 }
