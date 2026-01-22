@@ -1,0 +1,8 @@
+{
+  "name": "GLP-Care AI Assistant",
+  "description": "A high-trust, AI-assisted platform for GLP-1 therapy patients, featuring real-time expert-monitored chat and emergency SOS escalation.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
+}
